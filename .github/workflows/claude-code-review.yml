@@ -1,0 +1,54 @@
+name: Claude Code Review
+
+# Two independent reviews of every PR. The steps live in cerebrai-app/actions;
+# triggers, job conditions and permissions stay here.
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+
+# A new commit on the PR cancels the review of the previous one.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+# The two reviews are separate jobs so they run in parallel and one failing
+# doesn't stop the other.
+jobs:
+  ponytail-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+      id-token: write
+    steps:
+      - uses: cerebrai-app/actions/ponytail-review@57b263623437524d4a872fe0b268b94e96d0b046 # v1.0.0
+        with:
+          claude-code-oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+
+  claude-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+      id-token: write
+    steps:
+      - uses: cerebrai-app/actions/claude-review@57b263623437524d4a872fe0b268b94e96d0b046 # v1.0.0
+        with:
+          claude-code-oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+
+  # Collapse earlier ponytail reports as "outdated", so only the newest one stays
+  # open on the PR. A separate job on purpose: it needs write access to comments,
+  # and the job that runs the third-party plugin should not have that. It runs
+  # only after a successful review, so a failed review never hides the last report.
+  minimize-old-ponytail-reviews:
+    needs: ponytail-review
+    if: ${{ needs.ponytail-review.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: cerebrai-app/actions/minimize-ponytail-reviews@57b263623437524d4a872fe0b268b94e96d0b046 # v1.0.0

@@ -1,0 +1,39 @@
+name: Renovate
+
+# Self-hosted Renovate. It opens PRs that bump the pinned GitHub Actions,
+# including cerebrai-app/actions (see renovate.json).
+#
+# Runs weekly, and can be started by hand from the Actions tab ("Run workflow",
+# with an optional dry run that opens no PRs).
+#
+# Authenticates as a GitHub App. Needs two secrets (repository or organization
+# level): RENOVATE_APP_CLIENT_ID and RENOVATE_APP_PRIVATE_KEY. The app's required
+# permissions are listed in cerebrai-app/actions (renovate/action.yml). Until the
+# secrets exist the job only prints a warning.
+
+on:
+  schedule:
+    - cron: "41 17 * * 1" # Mondays, 12:41 EST / 13:41 EDT
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run: log what would change without opening PRs"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: renovate
+  cancel-in-progress: false
+
+jobs:
+  renovate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: cerebrai-app/actions/renovate@57b263623437524d4a872fe0b268b94e96d0b046 # v1.0.0
+        with:
+          app-client-id: ${{ secrets.RENOVATE_APP_CLIENT_ID }}
+          app-private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY }}
+          dry-run: ${{ inputs.dry_run }}

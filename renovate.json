@@ -1,0 +1,6 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", "helpers:pinGitHubActionDigests"],
+  "description": "Keeps pinned GitHub Actions up to date, including the shared cerebrai-app/actions (which pin the ponytail marketplace and the Renovate image themselves). Only GitHub Actions are managed here.",
+  "enabledManagers": ["github-actions"]
+}

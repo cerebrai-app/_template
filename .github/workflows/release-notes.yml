@@ -58,7 +58,7 @@ jobs:
           persist-credentials: false
 
       - id: notes
-        uses: cerebrai-app/actions/release-notes@82ef82d3c4d0f83552f282aed8ca98d5c92c0daa
+        uses: cerebrai-app/actions/release-notes@a0a097e0166c34eba18e839b3856b6fcbe5bd6e8 # v3.2.0
         with:
           claude-code-oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           tag: ${{ env.TAG }}
@@ -75,6 +75,6 @@ jobs:
     permissions:
       contents: write # create the release, or edit its notes
     steps:
-      - uses: cerebrai-app/actions/publish-release-notes@82ef82d3c4d0f83552f282aed8ca98d5c92c0daa
+      - uses: cerebrai-app/actions/publish-release-notes@a0a097e0166c34eba18e839b3856b6fcbe5bd6e8 # v3.2.0
         with:
           tag: ${{ env.TAG }}

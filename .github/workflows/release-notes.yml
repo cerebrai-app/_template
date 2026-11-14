@@ -5,12 +5,14 @@ name: Release notes
 # publish-release-notes/action.yml); triggers and permissions stay here.
 #
 # Runs when a version tag is pushed, or a release is published from the web UI,
-# and can be started by hand for any existing tag to rewrite its notes. Tags
-# that are not vX.Y.Z (e.g. a floating v1) are ignored. The release is created
-# if it does not exist yet; this only ever writes the notes, never the
-# release's files. With cerebrai-app/actions' go-release.yml (v3.2.0 or later)
-# either workflow may create the release first: go-release.yml uploads its
-# archives to an existing release and keeps its notes.
+# and can be started by hand for any existing tag to rewrite its notes. Pushes
+# of other tags (e.g. a floating v1) do not start it; a release published for
+# such a tag, or a manual run with one, fails at the release-notes action's tag
+# check without writing anything. The release is created if it does not exist
+# yet; this only ever writes the notes, never the release's files. With
+# cerebrai-app/actions' go-release.yml (v3.2.0 or later) either workflow may
+# create the release first: go-release.yml uploads its archives to an existing
+# release and keeps its notes.
 #
 # Claude writes the notes in a job that can only read; a separate job with
 # contents: write puts them on the release.

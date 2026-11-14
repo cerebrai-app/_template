@@ -1,22 +1,20 @@
 # _template
 
-Template repository for new cerebrai-app repositories.
+Starting point for new cerebrai-app repositories.
 
-## What's included
-
-The standard GitHub Actions workflows, which call the shared composite actions in
-[cerebrai-app/actions](https://github.com/cerebrai-app/actions):
+## Workflows
 
 | Workflow | What it does |
 | --- | --- |
 | [`claude.yml`](.github/workflows/claude.yml) | Runs Claude Code when someone mentions `@claude` |
-| [`claude-code-review.yml`](.github/workflows/claude-code-review.yml) | Reviews every PR with the `code-review` and ponytail plugins |
-| [`renovate.yml`](.github/workflows/renovate.yml) | Weekly self-hosted Renovate, configured by [`renovate.json`](renovate.json) to keep pinned actions current |
+| [`claude-code-review.yml`](.github/workflows/claude-code-review.yml) | Reviews every pull request |
+| [`release-notes.yml`](.github/workflows/release-notes.yml) | Writes the GitHub Release notes for each `vX.Y.Z` tag with Claude Code |
+| [`renovate.yml`](.github/workflows/renovate.yml) | Keeps pinned actions up to date |
 
-## Secrets
+The steps live in [cerebrai-app/actions](https://github.com/cerebrai-app/actions), pinned by commit
+with the tag as a comment; Renovate keeps the pins current. The Claude workflows need the
+`CLAUDE_CODE_OAUTH_TOKEN` secret.
 
-Set these at the repository or organization level:
-
-- `CLAUDE_CODE_OAUTH_TOKEN` — for the Claude workflows.
-- `RENOVATE_APP_CLIENT_ID`, `RENOVATE_APP_PRIVATE_KEY` — for Renovate. Until they exist the job
-  only prints a warning.
+For release notes, set `about` in `release-notes.yml` to a sentence on what the repository is and
+who reads its releases. To write or rewrite the notes of an existing tag, run the workflow by hand
+from the Actions tab.

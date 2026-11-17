@@ -44,7 +44,7 @@ env:
 jobs:
   write:
     name: Write notes
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     permissions:
       contents: read
       pull-requests: read
@@ -58,7 +58,7 @@ jobs:
           persist-credentials: false
 
       - id: notes
-        uses: cerebrai-app/actions/release-notes@a0a097e0166c34eba18e839b3856b6fcbe5bd6e8 # v3.2.0
+        uses: cerebrai-app/actions/release-notes@da96b5c774508e239ab5f47a44af71a77381484c # v3.3.1
         with:
           claude-code-oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           tag: ${{ env.TAG }}
@@ -71,10 +71,10 @@ jobs:
     name: Publish notes
     needs: write
     if: ${{ needs.write.outputs.skip != 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     permissions:
       contents: write # create the release, or edit its notes
     steps:
-      - uses: cerebrai-app/actions/publish-release-notes@a0a097e0166c34eba18e839b3856b6fcbe5bd6e8 # v3.2.0
+      - uses: cerebrai-app/actions/publish-release-notes@da96b5c774508e239ab5f47a44af71a77381484c # v3.3.1
         with:
           tag: ${{ env.TAG }}

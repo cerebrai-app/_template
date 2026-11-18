@@ -58,7 +58,7 @@ jobs:
     permissions:
       actions: write # start this workflow with workflow_dispatch
     steps:
-      - uses: cerebrai-app/actions/setup-gh@9703ebb09a9bf5ede7b18e00b93d8b882c5a211d # v3.6.0
+      - uses: cerebrai-app/actions/setup-gh@1f3c4aea891f239f2e2f6276908648ee08416739 # v3.6.1
 
       - name: Start this workflow for the tag
         env:
@@ -92,7 +92,7 @@ jobs:
           persist-credentials: false
 
       - id: notes
-        uses: cerebrai-app/actions/release-notes@9703ebb09a9bf5ede7b18e00b93d8b882c5a211d # v3.6.0
+        uses: cerebrai-app/actions/release-notes@1f3c4aea891f239f2e2f6276908648ee08416739 # v3.6.1
         with:
           claude-code-oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           tag: ${{ env.TAG }}
@@ -109,6 +109,6 @@ jobs:
     permissions:
       contents: write # create the release, or edit its notes
     steps:
-      - uses: cerebrai-app/actions/publish-release-notes@9703ebb09a9bf5ede7b18e00b93d8b882c5a211d # v3.6.0
+      - uses: cerebrai-app/actions/publish-release-notes@1f3c4aea891f239f2e2f6276908648ee08416739 # v3.6.1
         with:
           tag: ${{ env.TAG }}

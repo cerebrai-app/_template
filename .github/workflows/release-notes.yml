@@ -14,6 +14,11 @@ name: Release notes
 # create the release first: go-release.yml uploads its archives to an existing
 # release and keeps its notes.
 #
+# claude-code-action rejects push and release events ("Unsupported event type"),
+# so on those the dispatch job only starts this workflow again by hand
+# (workflow_dispatch) for the tag, with rewrite off, and the notes are written
+# in that run.
+#
 # Claude writes the notes in a job that can only read; a separate job with
 # contents: write puts them on the release.
 
@@ -28,6 +33,10 @@ on:
         description: "Version tag to write the notes for, e.g. v1.2.3"
         required: true
         type: string
+      rewrite:
+        description: "Rewrite notes this workflow already wrote for the tag"
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -42,8 +51,33 @@ env:
   TAG: ${{ inputs.tag || github.event.release.tag_name || github.ref_name }}
 
 jobs:
+  dispatch:
+    name: Start the notes run
+    if: ${{ github.event_name != 'workflow_dispatch' }}
+    runs-on: self-hosted
+    permissions:
+      actions: write # start this workflow with workflow_dispatch
+    steps:
+      - uses: cerebrai-app/actions/setup-gh@9703ebb09a9bf5ede7b18e00b93d8b882c5a211d # v3.6.0
+
+      - name: Start this workflow for the tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORKFLOW: ${{ github.workflow_ref }}
+          # Run the default branch's copy of this workflow, which has the rewrite
+          # input even when the tag points at an older commit.
+          REF: ${{ github.event.repository.default_branch }}
+        run: |
+          # workflow_ref is owner/repo/.github/workflows/<file>@<ref>; gh wants the file name.
+          workflow=${WORKFLOW%@*}
+          workflow=${workflow##*/}
+          gh workflow run "$workflow" --repo "$GITHUB_REPOSITORY" --ref "$REF" \
+            -f tag="$TAG" -f rewrite=false
+          echo "::notice::Started $workflow for $TAG; the notes are written in that run."
+
   write:
     name: Write notes
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: self-hosted
     permissions:
       contents: read
@@ -58,11 +92,11 @@ jobs:
           persist-credentials: false
 
       - id: notes
-        uses: cerebrai-app/actions/release-notes@da96b5c774508e239ab5f47a44af71a77381484c # v3.3.1
+        uses: cerebrai-app/actions/release-notes@9703ebb09a9bf5ede7b18e00b93d8b882c5a211d # v3.6.0
         with:
           claude-code-oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           tag: ${{ env.TAG }}
-          rewrite: ${{ github.event_name == 'workflow_dispatch' }}
+          rewrite: ${{ inputs.rewrite }}
           # Optional: what this repository is and who reads its releases, to
           # steer the notes. Empty points Claude at the README.
           about: ''
@@ -70,11 +104,11 @@ jobs:
   publish:
     name: Publish notes
     needs: write
-    if: ${{ needs.write.outputs.skip != 'true' }}
+    if: ${{ github.event_name == 'workflow_dispatch' && needs.write.outputs.skip != 'true' }}
     runs-on: self-hosted
     permissions:
       contents: write # create the release, or edit its notes
     steps:
-      - uses: cerebrai-app/actions/publish-release-notes@da96b5c774508e239ab5f47a44af71a77381484c # v3.3.1
+      - uses: cerebrai-app/actions/publish-release-notes@9703ebb09a9bf5ede7b18e00b93d8b882c5a211d # v3.6.0
         with:
           tag: ${{ env.TAG }}

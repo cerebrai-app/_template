@@ -28,3 +28,13 @@ Set these at the repository or organization level:
 notes from the commits and pull requests since the previous version. Set its `about` input to a
 sentence on what the repository is and who reads its releases. To write or rewrite the notes of an
 existing tag, run the workflow by hand from the Actions tab.
+
+## Go repositories
+
+The template has no build workflows, since they depend on the language. For a Go module, copy
+`ci.yml` and `release.yml` from the
+[Go repositories section](https://github.com/cerebrai-app/actions#go-repositories) of
+cerebrai-app/actions (they are go-cerebrai's workflows). Each job runs one of the Go actions:
+`go-lint`, `go-test`, `go-cross-build` and `govulncheck` for CI; `go-release-build`,
+`go-release-check-tap-app` and `go-release-publish` for releases with GoReleaser. Add `gomod`
+to `enabledManagers` in `renovate.json`.

@@ -54,7 +54,7 @@ jobs:
   dispatch:
     name: Start the notes run
     if: ${{ github.event_name != 'workflow_dispatch' }}
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     permissions:
       actions: write # start this workflow with workflow_dispatch
     steps:
@@ -78,7 +78,7 @@ jobs:
   write:
     name: Write notes
     if: ${{ github.event_name == 'workflow_dispatch' }}
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: read
@@ -105,7 +105,7 @@ jobs:
     name: Publish notes
     needs: write
     if: ${{ github.event_name == 'workflow_dispatch' && needs.write.outputs.skip != 'true' }}
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     permissions:
       contents: write # create the release, or edit its notes
     steps:
